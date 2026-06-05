@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} — Abonelik Takip{% endblock %}
+
+{% block content %}
+<div class="form-wrap">
+  <div class="form-hdr">
+    <a href="{% url 'dashboard' %}" class="back-btn"><span class="material-symbols-rounded">arrow_back</span></a>
+    <h1>{{ title }}</h1>
+  </div>
+  <form method="post" class="form-card">
+    {% csrf_token %}
+    {% for field in form %}
+    <div class="form-group {% if field.errors %}error{% endif %}">
+      <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+      {{ field }}
+      {% if field.help_text %}<span class="form-help">{{ field.help_text }}</span>{% endif %}
+      {% if field.errors %}<span class="form-error">{{ field.errors.0 }}</span>{% endif %}
+    </div>
+    {% endfor %}
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">
+        <span class="material-symbols-rounded">check</span> {{ button_text }}
+      </button>
+      <a href="{% url 'dashboard' %}" class="btn btn-ghost">İptal</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

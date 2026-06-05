@@ -1,0 +1,96 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="tr" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Abonelik Takip{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,1,0" />
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+  {% if user.is_authenticated %}
+  <nav class="navbar">
+    <div class="nav-inner">
+      <a href="{% url 'dashboard' %}" class="nav-brand">
+        <span class="material-symbols-rounded">subscriptions</span>
+        <span>Abonelik Takip</span>
+      </a>
+      <div class="nav-links">
+        <a href="{% url 'subscription_list' %}" class="nav-link {% if request.resolver_match.url_name == 'subscription_list' %}active{% endif %}">
+          <span class="material-symbols-rounded">subscriptions</span> Abonelikler
+        </a>
+        <a href="{% url 'subscription_add' %}" class="nav-link {% if request.resolver_match.url_name == 'subscription_add' %}active{% endif %}">
+          <span class="material-symbols-rounded">add_circle</span> Ekle
+        </a>
+        <a href="{% url 'card_list' %}" class="nav-link {% if request.resolver_match.url_name == 'card_list' %}active{% endif %}">
+          <span class="material-symbols-rounded">credit_card</span> Kartlar
+        </a>
+        <a href="{% url 'logout' %}" class="nav-link logout">
+          <span class="material-symbols-rounded">logout</span> Çıkış
+        </a>
+        <button class="theme-btn" id="themeToggle" title="Tema Değiştir">
+          <span class="material-symbols-rounded dark-icon">dark_mode</span>
+          <span class="material-symbols-rounded light-icon">light_mode</span>
+        </button>
+      </div>
+      <button class="hamburger" id="hamburger" aria-label="Menü">
+        <span class="material-symbols-rounded">menu</span>
+      </button>
+    </div>
+  </nav>
+  <div class="mobile-overlay" id="mobileOverlay">
+    <a href="{% url 'subscription_list' %}" class="mobile-link">
+      <span class="material-symbols-rounded">subscriptions</span> Abonelikler
+    </a>
+    <a href="{% url 'subscription_add' %}" class="mobile-link">
+      <span class="material-symbols-rounded">add_circle</span> Abonelik Ekle
+    </a>
+    <a href="{% url 'card_list' %}" class="mobile-link">
+      <span class="material-symbols-rounded">credit_card</span> Kartlarım
+    </a>
+    <a href="{% url 'logout' %}" class="mobile-link">
+      <span class="material-symbols-rounded">logout</span> Çıkış
+    </a>
+    <button class="mobile-theme" id="mobileThemeToggle">
+      <span class="material-symbols-rounded" id="mobileThemeIcon">dark_mode</span>
+      <span id="mobileThemeText">Karanlık Mod</span>
+    </button>
+  </div>
+  {% endif %}
+
+  {% if messages %}
+  <div class="messages">
+    {% for message in messages %}
+    <div class="msg msg-{{ message.tags }}" data-msg>
+      <span class="material-symbols-rounded">
+        {% if message.tags == 'success' %}check_circle
+        {% elif message.tags == 'error' %}error
+        {% elif message.tags == 'warning' %}warning
+        {% else %}info{% endif %}
+      </span>
+      <span>{{ message }}</span>
+      <button class="msg-close" onclick="this.parentElement.remove()">
+        <span class="material-symbols-rounded">close</span>
+      </button>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <main class="main">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="footer">
+    <span>&copy; 2026 Abonelik Takip</span>
+  </footer>
+
+  <script src="{% static 'js/app.js' %}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

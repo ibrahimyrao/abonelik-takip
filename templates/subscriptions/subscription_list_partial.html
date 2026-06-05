@@ -1,0 +1,69 @@
+<div class="section">
+  <div class="section-hdr">
+    <h2><span class="material-symbols-rounded">subscriptions</span>Tüm Abonelikler</h2>
+    <a href="{% url 'subscription_add' %}" class="btn btn-sm btn-primary">
+      <span class="material-symbols-rounded">add</span> Ekle
+    </a>
+  </div>
+  {% if subscriptions %}
+  <div class="sub-list">
+    {% for sub in subscriptions %}
+    <div class="sub-item">
+      <div class="sub-icon" style="background: var(--cat-{{ sub.category }});">
+        <span class="material-symbols-rounded">
+          {% if sub.category == 'muzik' %}music_note
+          {% elif sub.category == 'video' %}movie
+          {% elif sub.category == 'oyun' %}sports_esports
+          {% elif sub.category == 'bulut' %}cloud
+          {% elif sub.category == 'yazilim' %}code
+          {% elif sub.category == 'egitim' %}school
+          {% elif sub.category == 'haber' %}newspaper
+          {% elif sub.category == 'saglik' %}fitness_center
+          {% else %}category{% endif %}
+        </span>
+      </div>
+      <div class="sub-body">
+        <span class="sub-name">{{ sub.name }}</span>
+        <span class="sub-meta">
+          <span class="material-symbols-rounded">event</span>{{ sub.renewal_date|date:"d M Y" }}
+          &bull; {{ sub.get_category_display }}
+          {% if sub.is_active %}
+          <span class="sub-card-badge" style="background: var(--success-bg); color: var(--success);">Aktif</span>
+          {% else %}
+          <span class="sub-inactive">Pasif</span>
+          {% if sub.cancelled_at %}
+          &bull; İptal: {{ sub.cancelled_at|date:"d M Y" }}
+          {% endif %}
+          {% endif %}
+          {% if sub.credit_card %}
+          <span class="sub-card-badge" style="background: {{ sub.credit_card.card_color }}20; color: {{ sub.credit_card.card_color }};">&bull;&bull;&bull;&bull; {{ sub.credit_card.last_four }}</span>
+          {% endif %}
+        </span>
+      </div>
+      <div class="sub-price">
+        <span class="amount">{{ sub.price }}₺</span>
+        <span class="cycle">{{ sub.get_billing_cycle_display }}</span>
+      </div>
+      <div class="sub-actions show">
+        <a href="{% url 'subscription_edit' sub.pk %}" class="btn-icon" title="Düzenle"><span class="material-symbols-rounded">edit</span></a>
+        {% if sub.is_active %}
+        <form method="post" action="{% url 'subscription_cancel' sub.pk %}" style="display:inline" onsubmit="return confirm('{{ sub.name }} aboneliğini iptal etmek istediğinize emin misiniz?')">
+          {% csrf_token %}
+          <button type="submit" class="btn-icon danger" title="İptal Et"><span class="material-symbols-rounded">cancel</span></button>
+        </form>
+        {% endif %}
+        <a href="{% url 'subscription_delete' sub.pk %}" class="btn-icon danger" title="Sil"><span class="material-symbols-rounded">delete</span></a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty">
+    <span class="material-symbols-rounded">inbox</span>
+    <p>Henüz abonelik eklenmemiş.</p>
+    <a href="{% url 'subscription_add' %}" class="btn btn-primary">
+      <span class="material-symbols-rounded">add</span> İlk Aboneliğini Ekle
+    </a>
+  </div>
+  {% endif %}
+</div>

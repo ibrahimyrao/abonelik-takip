@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Abonelik Sil — Abonelik Takip{% endblock %}
+
+{% block content %}
+<div class="form-wrap">
+  <div class="delete-card">
+    <span class="material-symbols-rounded big-icon">warning</span>
+    <h1>Aboneliği Sil</h1>
+    <p>Bu aboneliği silmek istediğinize emin misiniz?</p>
+    <div class="delete-details">
+      <strong>{{ subscription.name }}</strong> — {{ subscription.price }}₺/{{ subscription.get_billing_cycle_display }}
+    </div>
+    <form method="post">
+      {% csrf_token %}
+      <div class="delete-actions">
+        <button type="submit" class="btn btn-danger">
+          <span class="material-symbols-rounded">delete</span> Sil
+        </button>
+        <a href="{% url 'dashboard' %}" class="btn btn-ghost">İptal</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

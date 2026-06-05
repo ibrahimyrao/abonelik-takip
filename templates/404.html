@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Sayfa Bulunamadı — Abonelik Takip{% endblock %}
+
+{% block content %}
+<div class="error-page">
+  <div class="error-content">
+    <span class="material-symbols-rounded big-icon">search</span>
+    <h1>404</h1>
+    <p>Aradığınız sayfa bulunamadı.</p>
+    <a href="{% url 'dashboard' %}" class="btn btn-primary">
+      <span class="material-symbols-rounded">home</span> Ana Sayfaya Dön
+    </a>
+  </div>
+</div>
+{% endblock %}

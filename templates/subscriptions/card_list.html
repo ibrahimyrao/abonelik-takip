@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}Kartlarım — Abonelik Takip{% endblock %}
+
+{% block content %}
+<div class="page-hdr">
+  <h1><span class="material-symbols-rounded">credit_card</span>Kartlarım</h1>
+  <a href="{% url 'card_add' %}" class="btn btn-primary">
+    <span class="material-symbols-rounded">add</span> Yeni Kart Ekle
+  </a>
+</div>
+
+{% if cards %}
+<div class="cards-grid">
+  {% for card in cards %}
+  <div class="card-item">
+    <div class="card-visual-lg" style="background: linear-gradient(135deg, {{ card.card_color }}, {{ card.card_color }}88);">
+      <div class="card-top">
+        <span class="material-symbols-rounded">credit_card</span>
+        <span class="card-actions">
+          <a href="{% url 'card_edit' card.pk %}" title="Düzenle"><span class="material-symbols-rounded">edit</span></a>
+          <a href="{% url 'card_delete' card.pk %}" title="Sil"><span class="material-symbols-rounded">delete</span></a>
+        </span>
+      </div>
+      <div class="card-number">
+        <span>&bull;&bull;&bull;&bull;</span>
+        <span>&bull;&bull;&bull;&bull;</span>
+        <span>&bull;&bull;&bull;&bull;</span>
+        <span>{{ card.last_four }}</span>
+      </div>
+      <div class="card-bottom">
+        <span class="card-holder">{{ card.card_name }}</span>
+      </div>
+    </div>
+    <div class="card-info">
+      <span class="card-sub-count">{{ card.subscriptions.count }} abonelik bağlı</span>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty empty-lg">
+  <span class="material-symbols-rounded">credit_card_off</span>
+  <h3>Henüz kart eklenmemiş</h3>
+  <p>Aboneliklerinizi kartlarınızla ilişkilendirmek için bir kart ekleyin.</p>
+  <a href="{% url 'card_add' %}" class="btn btn-primary">
+    <span class="material-symbols-rounded">add</span> İlk Kartınızı Ekleyin
+  </a>
+</div>
+{% endif %}
+{% endblock %}

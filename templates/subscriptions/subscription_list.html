@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Abonelikler — Abonelik Takip{% endblock %}
+
+{% block content %}
+<script src="https://unpkg.com/htmx.org@2.0.4"></script>
+
+<form method="get" class="filter-bar"
+      hx-get="/abonelikler/"
+      hx-target="#sub-list-wrap"
+      hx-push-url="true"
+      hx-trigger="keyup changed delay:300ms from:input[name=q], change from:select"
+      hx-indicator="#loading">
+  <div class="filter-row">
+    <div class="filter-search">
+      <span class="material-symbols-rounded">search</span>
+      <input type="text" name="q" placeholder="Abonelik ara..." value="{{ filters.q|default:'' }}" autocomplete="off">
+    </div>
+    <select name="category">
+      <option value="">Tüm Kategoriler</option>
+      {% for key, label in categories %}
+      <option value="{{ key }}" {% if filters.category == key %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+    <select name="billing">
+      <option value="">Tüm Periyot</option>
+      <option value="monthly" {% if filters.billing == 'monthly' %}selected{% endif %}>Aylık</option>
+      <option value="yearly" {% if filters.billing == 'yearly' %}selected{% endif %}>Yıllık</option>
+    </select>
+    <select name="status">
+      <option value="">Tüm Durum</option>
+      <option value="active" {% if filters.status == 'active' %}selected{% endif %}>Aktif</option>
+      <option value="inactive" {% if filters.status == 'inactive' %}selected{% endif %}>Pasif</option>
+    </select>
+    <button type="submit" class="btn btn-sm btn-primary">Filtrele</button>
+    {% if filters.q or filters.category or filters.billing or filters.status %}
+    <a href="{% url 'subscription_list' %}" class="btn btn-sm btn-ghost">Temizle</a>
+    {% endif %}
+    <span id="loading" class="htmx-indicator" style="font-size:0.82rem;color:var(--text-dim)">Yükleniyor...</span>
+  </div>
+</form>
+
+<div id="sub-list-wrap">
+  {% include 'subscriptions/subscription_list_partial.html' %}
+</div>
+{% endblock %}

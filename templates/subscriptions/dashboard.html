@@ -1,0 +1,219 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Dashboard — Abonelik Takip{% endblock %}
+
+{% block content %}
+<div class="stats">
+  <div class="stat">
+    <div class="stat-top">
+      <div class="stat-icon accent"><span class="material-symbols-rounded">paid</span></div>
+    </div>
+    <div class="stat-value">{{ total_monthly|floatformat:0 }}<span class="stat-sub">₺</span></div>
+    <div class="stat-label">Aylık Toplam</div>
+  </div>
+  <div class="stat">
+    <div class="stat-top">
+      <div class="stat-icon warning"><span class="material-symbols-rounded">calendar_month</span></div>
+    </div>
+    <div class="stat-value">{{ total_yearly|floatformat:0 }}<span class="stat-sub">₺</span></div>
+    <div class="stat-label">Yıllık Toplam</div>
+  </div>
+  <div class="stat">
+    <div class="stat-top">
+      <div class="stat-icon success"><span class="material-symbols-rounded">subscriptions</span></div>
+    </div>
+    <div class="stat-value">{{ active_count }}</div>
+    <div class="stat-label">Aktif Abonelik</div>
+  </div>
+  <div class="stat">
+    <div class="stat-top">
+      <div class="stat-icon danger"><span class="material-symbols-rounded">notifications_active</span></div>
+    </div>
+    <div class="stat-value">{{ upcoming.count }}</div>
+    <div class="stat-label">Yaklaşan Ödeme</div>
+  </div>
+</div>
+
+<div class="dash-grid">
+  <div class="section">
+    <div class="section-hdr">
+      <h2><span class="material-symbols-rounded">calendar_month</span>{{ cal_month_name }} {{ cal_year }}</h2>
+      <div style="display:flex;gap:4px">
+        <a href="?month={{ prev_month }}&year={{ prev_year }}" class="btn-icon" title="Önceki Ay"><span class="material-symbols-rounded">chevron_left</span></a>
+        <a href="?month={{ next_month }}&year={{ next_year }}" class="btn-icon" title="Sonraki Ay"><span class="material-symbols-rounded">chevron_right</span></a>
+      </div>
+    </div>
+    <div class="cal-grid">
+      <div class="cal-hdr">Pzt</div><div class="cal-hdr">Sal</div><div class="cal-hdr">Çar</div><div class="cal-hdr">Per</div><div class="cal-hdr">Cum</div><div class="cal-hdr">Cmt</div><div class="cal-hdr">Paz</div>
+      {% for week in cal_weeks %}
+      {% for d in week %}
+      <div class="cal-day{% if d.is_today %} today{% endif %}{% if d.subs %} has-payment{% endif %}{% if d.is_past and not d.is_today %} past{% endif %}"{% if d.day %} title="{{ d.day }} {{ cal_month_name }}"{% endif %}>
+        {% if d.day %}
+        <span class="cal-num">{{ d.day }}</span>
+        {% for s in d.subs|slice:":2" %}
+        <span class="cal-sub">{{ s.name|truncatechars:10 }}</span>
+        {% endfor %}
+        {% if d.subs|length > 2 %}
+        <span class="cal-more">+{{ d.subs|length|add:"-2" }}</span>
+        {% endif %}
+        {% endif %}
+      </div>
+      {% endfor %}
+      {% endfor %}
+    </div>
+  </div>
+
+  {% if overdue %}
+  <div class="section danger">
+    <div class="section-hdr">
+      <h2><span class="material-symbols-rounded">warning</span>Gecikmiş Ödemeler</h2>
+      <span class="badge danger">{{ overdue.count }}</span>
+    </div>
+    <div class="sub-list">
+      {% for sub in overdue %}
+      <div class="sub-item overdue">
+        <div class="sub-icon overdue-icon"><span class="material-symbols-rounded">priority_high</span></div>
+        <div class="sub-body">
+          <span class="sub-name">{{ sub.name }}</span>
+          <span class="sub-meta overdue-meta">
+            <span class="material-symbols-rounded">event_busy</span>{{ sub.renewal_date|date:"d M Y" }}
+          </span>
+        </div>
+        <div class="sub-price">
+          <span class="amount">{{ sub.price }}₺</span>
+          <span class="cycle">{{ sub.get_billing_cycle_display }}</span>
+        </div>
+        <div class="sub-actions">
+          <a href="{% url 'subscription_edit' sub.pk %}" class="btn-icon" title="Düzenle"><span class="material-symbols-rounded">edit</span></a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% else %}
+  <div class="section">
+    <div class="section-hdr">
+      <h2><span class="material-symbols-rounded">check_circle</span>Gecikmiş Ödeme</h2>
+    </div>
+    <div class="empty" style="padding:24px 16px">
+      <span class="material-symbols-rounded">check_circle</span>
+      <p>Gecikmiş ödeme bulunmuyor.</p>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<div class="section">
+  <div class="section-hdr">
+    <h2><span class="material-symbols-rounded">list</span>Tüm Aboneliklerim</h2>
+    <a href="{% url 'subscription_add' %}" class="btn btn-sm btn-primary">
+      <span class="material-symbols-rounded">add</span> Ekle
+    </a>
+  </div>
+  {% if all_active %}
+  <div class="sub-list">
+    {% for sub in all_active %}
+    <div class="sub-item">
+      <div class="sub-icon" style="background: var(--cat-{{ sub.category }});">
+        <span class="material-symbols-rounded">
+          {% if sub.category == 'muzik' %}music_note
+          {% elif sub.category == 'video' %}movie
+          {% elif sub.category == 'oyun' %}sports_esports
+          {% elif sub.category == 'bulut' %}cloud
+          {% elif sub.category == 'yazilim' %}code
+          {% elif sub.category == 'egitim' %}school
+          {% elif sub.category == 'haber' %}newspaper
+          {% elif sub.category == 'saglik' %}fitness_center
+          {% else %}category{% endif %}
+        </span>
+      </div>
+      <div class="sub-body">
+        <span class="sub-name">{{ sub.name }}</span>
+        <span class="sub-meta">
+          <span class="material-symbols-rounded">event</span>{{ sub.renewal_date|date:"d M Y" }}
+          &bull; {{ sub.get_category_display }}
+          {% if sub.credit_card %}
+          <span class="sub-card-badge" style="background: {{ sub.credit_card.card_color }}20; color: {{ sub.credit_card.card_color }};">&bull;&bull;&bull;&bull; {{ sub.credit_card.last_four }}</span>
+          {% endif %}
+        </span>
+      </div>
+      <div class="sub-price">
+        <span class="amount">{{ sub.price }}₺</span>
+        <span class="cycle">{{ sub.get_billing_cycle_display }}</span>
+      </div>
+      <div class="sub-actions show">
+        <a href="{% url 'subscription_edit' sub.pk %}" class="btn-icon" title="Düzenle"><span class="material-symbols-rounded">edit</span></a>
+        <form method="post" action="{% url 'subscription_cancel' sub.pk %}" style="display:inline" onsubmit="return confirm('{{ sub.name }} aboneliğini iptal etmek istediğinize emin misiniz?')">
+          {% csrf_token %}
+          <button type="submit" class="btn-icon danger" title="İptal Et"><span class="material-symbols-rounded">cancel</span></button>
+        </form>
+        <a href="{% url 'subscription_delete' sub.pk %}" class="btn-icon danger" title="Sil"><span class="material-symbols-rounded">delete</span></a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty">
+    <span class="material-symbols-rounded">inbox</span>
+    <p>Henüz abonelik eklenmemiş.</p>
+    <a href="{% url 'subscription_add' %}" class="btn btn-primary">
+      <span class="material-symbols-rounded">add</span> İlk Aboneliğini Ekle
+    </a>
+  </div>
+  {% endif %}
+</div>
+
+<div class="dash-grid">
+  {% if card_summary %}
+  <div class="section">
+    <div class="section-hdr">
+      <h2><span class="material-symbols-rounded">credit_card</span>Kart Bazlı Harcama</h2>
+    </div>
+    <div class="card-grid">
+      {% for cs in card_summary %}
+      <div>
+        {% if cs.card %}
+        <div class="card-visual" style="background: linear-gradient(135deg, {{ cs.card.card_color }}, {{ cs.card.card_color }}99);">
+          <span class="name">{{ cs.card.card_name }}</span>
+          <span class="number">&bull;&bull;&bull;&bull; {{ cs.card.last_four }}</span>
+        </div>
+        {% else %}
+        <div class="card-visual none">
+          <span class="name">Kartsız</span>
+          <span class="number">—</span>
+        </div>
+        {% endif %}
+        <div class="card-stats">
+          <span class="amount">{{ cs.monthly_total }}₺<small>/ay</small></span>
+          <span class="count">{{ cs.subscription_count }} abonelik</span>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if category_data %}
+  <div class="section">
+    <div class="section-hdr">
+      <h2><span class="material-symbols-rounded">donut_small</span>Kategori Dağılımı</h2>
+    </div>
+    <div class="cat-bars">
+      {% for cat, amount in category_data.items %}
+      <div class="cat-bar">
+        <div class="cat-bar-hdr">
+          <span class="name">{{ cat }}</span>
+          <span class="amount">{{ amount }}₺/ay</span>
+        </div>
+        <div class="cat-bar-track">
+          <div class="cat-bar-fill" style="width: {% widthratio amount total_monthly 100 %}%"></div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}

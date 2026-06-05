@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Kart Sil — Abonelik Takip{% endblock %}
+
+{% block content %}
+<div class="form-wrap">
+  <div class="delete-card">
+    <span class="material-symbols-rounded big-icon">warning</span>
+    <h1>Kartı Sil</h1>
+    <p>Bu kredi kartını silmek istediğinize emin misiniz?</p>
+    <div class="delete-details">
+      <strong>{{ card.card_name }}</strong> — &bull;&bull;&bull;&bull; {{ card.last_four }}
+      {% if card.subscriptions.count %}
+      <br><br>
+      <div class="delete-warning">
+        <span class="material-symbols-rounded">info</span>
+        Bu karta bağlı {{ card.subscriptions.count }} abonelik var. Kart silinirse aboneliklerin kart bilgisi kalkacak.
+      </div>
+      {% endif %}
+    </div>
+    <form method="post">
+      {% csrf_token %}
+      <div class="delete-actions">
+        <button type="submit" class="btn btn-danger">
+          <span class="material-symbols-rounded">delete</span> Sil
+        </button>
+        <a href="{% url 'card_list' %}" class="btn btn-ghost">İptal</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
