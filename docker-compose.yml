@@ -8,8 +8,8 @@ services:
     environment:
       - DEBUG=0
       - SECRET_KEY=${SECRET_KEY:-change-me-to-a-very-strong-random-key-in-production}
-      - ALLOWED_HOSTS=abonelik.lasmon.me,192.168.1.110
-      - CSRF_TRUSTED_ORIGINS=https://abonelik.lasmon.me,http://192.168.1.110:8084
+      - ALLOWED_HOSTS=yourdomain.com,your-local-ip
+      - CSRF_TRUSTED_ORIGINS=https://yourdomain.com,http://your-local-ip:8084
       - SECURE_COOKIES=0
     ports:
       - "8084:8000"

@@ -42,8 +42,8 @@ nano .env
 ```
 SECRET_KEY=<yukarida-olusturdugun-key>
 DEBUG=0
-ALLOWED_HOSTS=abonelik.lasmon.me,localhost,127.0.0.1
-CSRF_TRUSTED_ORIGINS=https://abonelik.lasmon.me
+ALLOWED_HOSTS=abonelik.yourdomain.com,your-local-ip
+CSRF_TRUSTED_ORIGINS=https://abonelik.yourdomain.com
 ```
 
 ### Docker ile Başlatma
@@ -70,15 +70,15 @@ Uygulama artık `http://<RPi-IP>:8084` adresinde çalışıyor.
 
 ### Mevcut Tunnel'a Yeni Hostname Ekleme
 
-Zaten `dizitakip.lasmon.me` için bir tunnel kurulmuşsa:
+Zaten `diger-uygulama.yourdomain.com` için bir tunnel kurulmuşsa:
 
 1. **Cloudflare Dashboard** → Zero Trust → Networks → Tunnels
 2. Mevcut tunnel'ı seç → **Configure**
 3. **Public Hostnames** → **Add a public hostname**:
    - **Subdomain**: `abonelik`
-   - **Domain**: `lasmon.me`
+   - **Domain**: `yourdomain.com`
    - **Type**: `HTTP`
-   - **URL**: `localhost:8084`
+   - **URL**: `your-local-ip:8084`
 4. Kaydet
 
 ### Yeni Tunnel Kurulumu (ilk kez ise)
@@ -100,13 +100,13 @@ tunnel: <TUNNEL-ID>
 credentials-file: /root/.cloudflared/<TUNNEL-ID>.json
 
 ingress:
-  - hostname: abonelik.lasmon.me
-    service: http://localhost:8084
+  - hostname: abonelik.yourdomain.com
+    service: http://your-local-ip:8084
   - service: http_status:404
 EOF
 
 # DNS kaydı ekle
-cloudflared tunnel route dns <TUNNEL-ID> abonelik.lasmon.me
+cloudflared tunnel route dns <TUNNEL-ID> abonelik.yourdomain.com
 
 # Başlat
 cloudflared tunnel run
@@ -131,11 +131,11 @@ Uygulamayı sadece sana özel yapmak için Cloudflare Access kullanabilirsin:
 3. Ayarlar:
    - **Application name**: Abonelik Takip
    - **Session duration**: 24 hours
-   - **Application domain**: `abonelik.lasmon.me`
+   - **Application domain**: `abonelik.yourdomain.com`
 4. **Policy** oluştur:
    - **Policy name**: Only Me
    - **Action**: Allow
-   - **Include**: Emails → `senin@email.com`
+   - **Include**: Emails → `your-email@example.com`
 5. Kaydet
 
 Bu sayede uygulama iki katmanlı güvenliğe sahip olur:
